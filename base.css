@@ -1,0 +1,13 @@
+*{
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+#game{
+    /*background: #0b2e13;*/
+    width: 90vw;
+    height: 90vh;
+    position: absolute;
+    bottom: 0;
+    top: 0;
+}
