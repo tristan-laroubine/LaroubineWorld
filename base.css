@@ -5,8 +5,8 @@
 }
 #game{
     /*background: #0b2e13;*/
-    width: 90vw;
-    height: 90vh;
+    width: 100vw;
+    height: 100%;
     position: absolute;
     bottom: 0;
     top: 0;
