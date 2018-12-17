@@ -25,6 +25,40 @@ class Mobile{
     setup(){
 
     }
+    checkCollision(){
+        for(let i =0; i < mobiles.length; ++i)
+        {
+            if (this.x  === mobiles[i].x && this.y === mobiles[i].y)
+            {
+                continue;
+
+            }
+
+            if (this.x + (this.width-140) >= mobiles[i].x && mobiles[i].x + mobiles[i].width >= this.x + this.width-70) {
+                if (this.y + (this.height)-45 >= mobiles[i].y &&mobiles[i].y + mobiles[i].height >= this.y + this.height-140 )
+                {
+                    switch (this.keyPush)
+                    {
+                        case "None":
+                            break;
+                        case "U":
+                            this.y = this.y + this.vitesse;
+                            break;
+                        case "L":
+                            this.x = this.x + this.vitesse;
+                            break;
+                        case "R":
+                            this.x = this.x - this.vitesse;
+                            break;
+                        case "D":
+                            this.y = this.y - this.vitesse;
+                            break;
+                    }
+                }
+            }
+        }
+
+    }
     draw(){
         ++this.frameDeplacement;
 
@@ -89,7 +123,7 @@ class Mobile{
 class Player extends Mobile{
 
     constructor(skin){
-        super(skin, -50, heightScreenSize/2,200,200, 10);
+        super(skin, widthScreenSize/2, heightScreenSize/2,200,200, 10);
         this.keyPush="None";
     }
     draw(){
@@ -216,45 +250,12 @@ class Player extends Mobile{
         }
     }
 
-    checkCollision(){
-        for(let i =0; i < mobiles.length; ++i)
-        {
-            if (this.x  === mobiles[i].x && this.y === mobiles[i].y)
-            {
-                continue;
 
-            }
-
-            if (this.x + (this.width-140) >= mobiles[i].x && mobiles[i].x + mobiles[i].width >= this.x + this.width-70) {
-                if (this.y + (this.height)-45 >= mobiles[i].y &&mobiles[i].y + mobiles[i].height >= this.y + this.height-140 )
-                {
-                    switch (this.keyPush)
-                    {
-                        case "None":
-                            break;
-                        case "U":
-                            this.y = this.y + this.vitesse;
-                            break;
-                        case "L":
-                            this.x = this.x + this.vitesse;
-                            break;
-                        case "R":
-                            this.x = this.x - this.vitesse;
-                            break;
-                        case "D":
-                            this.y = this.y - this.vitesse;
-                            break;
-                    }
-                }
-            }
-        }
-
-    }
 }
 
 class Bot extends Mobile{
     constructor(){
-        super("img/skinPlayer/2.png", getRandomInt(widthScreenSize), getRandomInt(heightScreenSize),200,200, getRandomInt(5)+5);
+        super("img/skinPlayer/bot"+getRandomInt(6)+".png", getRandomInt(widthScreenSize), getRandomInt(heightScreenSize),200,200, getRandomInt(5)+5);
         this.keyPush="None";
         this.frameRandomDeplacement=0;
     }
@@ -264,6 +265,7 @@ class Bot extends Mobile{
         this.checkDirection();
         ++this.frameDeplacement;
         this.checkBorderMap();
+        this.checkCollision();
     }
 
     checkDirection(){
@@ -291,7 +293,8 @@ class Bot extends Mobile{
 
     }
     selectRandomDirection(){
-        if(this.frameRandomDeplacement%30 === 0){
+        if(this.frameRandomDeplacement%100 === 0){
+            this.frameRandomDeplacement = getRandomInt(50);
             switch (getRandomInt(4))
             {
                 case 0:
@@ -340,22 +343,28 @@ let testPlayer = new Player("img/skinPlayer/2.png");
 let bot = new Bot();
 let bot2 = new Bot();
 let bot3 = new Bot();
-let testColision = new Mobile("img/skinPlayer/2.png",200,200,200,200);
-mobiles.push(testColision);
+let bot4 = new Bot();
+let bot5 = new Bot();
+// let testColision = new Mobile("img/skinPlayer/2.png",200,200,200,200);
+// mobiles.push(testColision);
 mobiles.push(testPlayer);
-// mobiles.push(bot);
-// mobiles.push(bot2);
-// mobiles.push(bot3);
+mobiles.push(bot);
+mobiles.push(bot2);
+mobiles.push(bot3);
+mobiles.push(bot4);
+mobiles.push(bot5);
 function draw() {
-    ctx.fillRect(0,0,2000,2000);
-
-
+    background = new Image();
+    background.src = "img/skinPlayer/background.png";
+    ctx.drawImage(background,0,0,600,352,0,0,2000,1000);
 
     testPlayer.draw();
-    // bot.draw();
-    // bot2.draw();
-    // bot3.draw();
-    testColision.draw();
+    bot.draw();
+    bot2.draw();
+    bot3.draw();
+    bot4.draw();
+    bot5.draw();
+    // testColision.draw();
     window.requestAnimationFrame(draw);
 
 }
