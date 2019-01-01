@@ -7,50 +7,47 @@ var ctx = c.getContext("2d");
 /* DEBUT CLASS*/
 
 class Obstacle{
-    constructor(x,y,w,h)
+    constructor(x,y,w,h,type)
     {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
+        this.x = 50*x;
+        this.y = 50*y;
+        this.w = 50*w;
+        this.h = 50*h;
         this.vitesse = 5;
+        this.img = new Image();
+        this.img.src = "img/type"+type+".png";
     }
     draw(){
-        ctx.beginPath();
-        ctx.rect(this.x,this.y,this.w,this.h);
-        ctx.fillStyle = "red";
-        ctx.fill();
-    }
-
-    draw(nb){
-        if (nb===0){
-            this.avancer();
+        for (let i = 0 ; i * 50 < this.w; ++i){
+            ctx.drawImage(this.img,this.x+((i)*50),this.y);
         }
-        else if(nb===1)
-        {
-            this.reculer();
+        let img1;
+        if (this.h > 50) {
+            for (let i = 1; i * 50 < this.h; ++i) {
+                img1 = new Image();
+                img1.src = "img/type" + 0 + ".png";
+                ctx.drawImage(img1, this.x, this.y + ((i) * 50));
+                if (this.w>50){
+                    for (let j =0; j * 50 < this.w;++j){
+                        ctx.drawImage(img1, this.x + (j*50), this.y + ((i) * 50));
+                    }
+                }
+            }
         }
-        ctx.beginPath();
-        ctx.rect(this.x,this.y,this.w,this.h);
-        ctx.fillStyle = "red";
-        ctx.fill();
     }
-    avancer(){
-        this.x = this.x - this.vitesse;
-    }
-
-    reculer() {
-        this.x = this.x + this.vitesse;
+    update(decalage)
+    {
+        this.x = this.x - decalage;
     }
 }
 
 class Player {
     constructor() {
-        this.x = 100;
+        this.x = 400;
         this.y = 50;
         this.w = 50;
         this.h = 100;
-        this.vitesseX = 5;
+        this.vitesseX = 15;
         this.vitesseY = 1;
         this.keyPush = "none";
     }
@@ -84,20 +81,24 @@ class Player {
 
     collisionY() {
         let obstacle;
-        for (let i = 0; i < obstacles.length; ++i) {
-            obstacle = obstacles[i];
+        for (let i = 0; i < world.obstacles.length; ++i) {
+            obstacle = world.obstacles[i];
             if (this.y + this.h >= obstacle.y && this.y <= obstacle.y + obstacle.h) {
                 if (this.x + this.w > obstacle.x && this.x < obstacle.x + obstacle.w)
                 {
-                    this.y = this.y = obstacle.y - this.h;
+                    if(this.vitesseY>0) this.y = obstacle.y - this.h;
+                    else {
+                        this.y=obstacle.y + obstacle.h;
+                        this.vitesseY = 2;
+                    }
                 }
             }
         }
     }
     collisionX(){
         let obstacle;
-        for (let i = 0; i < obstacles.length; ++i) {
-            obstacle = obstacles[i];
+        for (let i = 0; i < world.obstacles.length; ++i) {
+            obstacle = world.obstacles[i];
             if (this.y + this.h > obstacle.y && this.y < obstacle.y + obstacle.h) {
                 if (this.x + this.w >= obstacle.x && this.x <= obstacle.x + obstacle.w) {
                         if (this.keyPush==="R")this.x = obstacle.x - this.w;
@@ -115,12 +116,16 @@ class Player {
         }
         else if(this.keyPush==="L")
         {
-            this.x = this.x - this.vitesseX;
+            if(this.x >800 || world.decalage <= 0 )  this.x = this.x - this.vitesseX;
+
+            else world.avancer(-this.vitesseX);
+            console.log(world.decalage + " ");
             this.collisionX();
         }
         else if(this.keyPush==="R")
         {
-            this.x = this.x + this.vitesseX;
+            if (this.x < 1200 ) this.x = this.x + this.vitesseX;
+            else world.avancer(this.vitesseX);
             this.collisionX();
         }
     }
@@ -180,15 +185,44 @@ class Player {
 
 }
 
-let o1 = new Obstacle(100,900,500,50);
-let o2 = new Obstacle(300,850,50,50);
-obstacles = [];
+class World{
+    constructor(){
+        this.obstacles = [];
+        this.decalage = 0;
+    }
+    initialization()
+    {
+        let o1 = new Obstacle(5,10,15,4,1);
+        let o2 = new Obstacle(20,9,15,5,1);
+        let o3 = new Obstacle(5,4,4,1,1);
 
+        this.obstacles.push(o1);
+        this.obstacles.push(o2);
+        this.obstacles.push(o3);
+        // this.obstacles.push(o2);
+        // this.obstacles.push(o3);
+    }
+    draw(){
+        for (let i=0; i < this.obstacles.length; ++i )
+        {
+            this.obstacles[i].draw();
+        }
+    }
+    avancer(decalage)
+    {
+        this.decalage = this.decalage + decalage;
+        for (let i=0; i < this.obstacles.length; ++i )
+        {
+            this.obstacles[i].update(decalage);
+        }
+    }
+}
+
+let world = new World();
 let player = new Player();
 function start() {
+    world.initialization();
     window.requestAnimationFrame(draw);
-    obstacles.push(o1);
-    obstacles.push(o2);
 }
 
 function draw() {
@@ -198,9 +232,7 @@ function draw() {
     ctx.fill();
 
 
-    o1.draw();
-    o2.draw();
-
+    world.draw();
     player.draw();
     window.requestAnimationFrame(draw);
 
